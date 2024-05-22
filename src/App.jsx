@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import './App.css'
 
 function App() {
@@ -7,6 +7,31 @@ function App() {
   const [numberAllowed, setNumberAllowed] = useState(false)
   const [charAllowed, setCharAllowed] = useState(false)
   const [password, setPassword] = useState('')
+
+
+  const generatorPassword = useCallback(() => {
+    let pass = ''
+    let str = 'ABCDEFGHIJKLMNOPQRSTUUVWXYZabcdefghijklmnopqrestuvwxyz'
+
+    if (numberAllowed) str += '0123456789'
+    if (charAllowed) str += '!@#$%^&*()'
+
+    for (let i = 1; i < length; i++) {
+      const char = Math.floor(Math.random() * str.length + 1)
+      pass += str.charAt(char)
+    }
+
+    setPassword(pass)
+  }, [numberAllowed, charAllowed, length])
+
+
+  const copyPasswordToClipboard = ()=>{
+    window.navigator.clipboard.writeText(password)
+  }
+
+  useEffect(() => {
+    generatorPassword()
+  }, [numberAllowed, charAllowed, length])
 
   return (
     <div className='w-full max-w-md mx-auto shadow-md rounded-lg px-4 py-3 my-8 bg-gray-800 text-orange-500'>
@@ -20,7 +45,9 @@ function App() {
           readOnly
 
         />
-        <button className='outline-none bg-blue-700 text-white px-3 py-0.5 shrink-0'>
+        <button
+          onClick={copyPasswordToClipboard}
+          className='outline-none bg-blue-700 text-white px-3 py-0.5 shrink-0'>
           Copy
         </button>
       </div>
@@ -40,8 +67,8 @@ function App() {
           <input
             type="checkbox"
             defaultChecked={numberAllowed}
-            onChange={()=>{
-              setNumberAllowed((prev)=> !prev )
+            onChange={() => {
+              setNumberAllowed((prev) => !prev)
             }}
             name=""
             id=""
@@ -52,8 +79,8 @@ function App() {
           <input
             type="checkbox"
             defaultChecked={charAllowed}
-            onChange={()=>{
-              setCharAllowed((prev)=> !prev )
+            onChange={() => {
+              setCharAllowed((prev) => !prev)
             }}
             name=""
             id=""
