@@ -29,9 +29,10 @@ function App() {
     window.navigator.clipboard.writeText(password)
   }
 
-  useEffect(() => {
+
+  const handleInput = ()=>{
     generatorPassword()
-  }, [numberAllowed, charAllowed, length])
+  }
 
   return (
     <div className='w-full max-w-md mx-auto shadow-md rounded-lg px-4 py-3 my-8 bg-gray-800 text-orange-500'>
@@ -59,7 +60,10 @@ function App() {
             max={100}
             value={length}
             className='cursor-pointer'
-            onChange={(e) => setLength(e.target.value)}
+            onChange={(e) => {
+              setLength(e.target.value)
+              handleInput()
+            }}
           />
           <label htmlFor="length">{length}</label>
         </div>
@@ -69,6 +73,7 @@ function App() {
             defaultChecked={numberAllowed}
             onChange={() => {
               setNumberAllowed((prev) => !prev)
+              generatorPassword()
             }}
             name=""
             id=""
@@ -81,6 +86,7 @@ function App() {
             defaultChecked={charAllowed}
             onChange={() => {
               setCharAllowed((prev) => !prev)
+              handleInput()
             }}
             name=""
             id=""
