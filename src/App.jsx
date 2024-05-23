@@ -3,36 +3,43 @@ import './App.css'
 
 function App() {
 
-  const [length, setLength] = useState(8)
-  const [numberAllowed, setNumberAllowed] = useState(false)
-  const [charAllowed, setCharAllowed] = useState(false)
-  const [password, setPassword] = useState('')
+  const [data, setData] = useState({
+    length: 8,
+    numberAllowed: false,
+    charAllowed: false,
+    password: ''
+  })
+
+  // const [length, setLength] = useState(8)
+  // const [numberAllowed, setNumberAllowed] = useState(false)
+  // const [charAllowed, setCharAllowed] = useState(false)
+  // const [password, setPassword] = useState('')
 
 
   const generatorPassword = useCallback(() => {
     let pass = ''
     let str = 'ABCDEFGHIJKLMNOPQRSTUUVWXYZabcdefghijklmnopqrestuvwxyz'
 
-    if (numberAllowed) str += '0123456789'
-    if (charAllowed) str += '!@#$%^&*()'
-
-    for (let i = 1; i < length; i++) {
+    if (data.numberAllowed) str += '0123456789'
+    if (data.charAllowed) str += '!@#$%^&*()'
+    for (let i = 1; i < data.length; i++) {
       const char = Math.floor(Math.random() * str.length + 1)
       pass += str.charAt(char)
     }
 
-    setPassword(pass)
-  }, [numberAllowed, charAllowed, length])
+    setData(prevData => ({ ...prevData, password: pass }))
+  }, [data])
 
 
-  const copyPasswordToClipboard = ()=>{
-    window.navigator.clipboard.writeText(password)
+  const copyPasswordToClipboard = () => {
+    window.navigator.clipboard.writeText(data.password)
   }
 
-
-  const handleInput = ()=>{
+  const handlePasswordGenerator = () => {
     generatorPassword()
   }
+  
+  
 
   return (
     <div className='w-full max-w-md mx-auto shadow-md rounded-lg px-4 py-3 my-8 bg-gray-800 text-orange-500'>
@@ -40,7 +47,7 @@ function App() {
       <div className="flex shadow rounded-lg overflow-hidden mb-4">
         <input
           type="text"
-          value={password}
+          value={data.password}
           className='outline-none w-full py-1 px-3'
           placeholder='Password'
           readOnly
@@ -58,22 +65,23 @@ function App() {
             type="range"
             min={6}
             max={100}
-            value={length}
+            value={data.length}
             className='cursor-pointer'
             onChange={(e) => {
-              setLength(e.target.value)
-              handleInput()
+              handlePasswordGenerator()
+
+              setData(prevData => ({ ...prevData, length: parseInt(e.target.value) }))
             }}
           />
-          <label htmlFor="length">{length}</label>
+          <label htmlFor="length">{data.length}</label>
         </div>
         <div className='flex items-center gap-x-1'>
           <input
             type="checkbox"
-            defaultChecked={numberAllowed}
+            defaultChecked={data.numberAllowed}
             onChange={() => {
-              setNumberAllowed((prev) => !prev)
-              generatorPassword()
+              setData(prevData => ({ ...prevData, numberAllowed: !prevData.numberAllowed }))
+              handlePasswordGenerator()
             }}
             name=""
             id=""
@@ -83,10 +91,10 @@ function App() {
         <div className='flex items-center gap-x-1'>
           <input
             type="checkbox"
-            defaultChecked={charAllowed}
+            defaultChecked={data.charAllowed}
             onChange={() => {
-              setCharAllowed((prev) => !prev)
-              handleInput()
+              setData(prevData => ({ ...prevData, charAllowed: !prevData.charAllowed }))
+              handlePasswordGenerator()
             }}
             name=""
             id=""
