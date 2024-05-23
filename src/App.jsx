@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect } from 'react'
 import './App.css'
 
 function App() {
-
   const [data, setData] = useState({
     length: 8,
     numberAllowed: false,
@@ -10,36 +9,35 @@ function App() {
     password: ''
   })
 
-  // const [length, setLength] = useState(8)
-  // const [numberAllowed, setNumberAllowed] = useState(false)
-  // const [charAllowed, setCharAllowed] = useState(false)
-  // const [password, setPassword] = useState('')
-
-
   const generatorPassword = useCallback(() => {
     let pass = ''
-    let str = 'ABCDEFGHIJKLMNOPQRSTUUVWXYZabcdefghijklmnopqrestuvwxyz'
+    let str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 
     if (data.numberAllowed) str += '0123456789'
     if (data.charAllowed) str += '!@#$%^&*()'
-    for (let i = 1; i < data.length; i++) {
-      const char = Math.floor(Math.random() * str.length + 1)
+    for (let i = 0; i < data.length; i++) { // Start from 0 and loop until length
+      const char = Math.floor(Math.random() * str.length) // Correct the random index calculation
       pass += str.charAt(char)
     }
 
     setData(prevData => ({ ...prevData, password: pass }))
   }, [data])
 
+  useEffect(() => {
+    generatorPassword()
+  }, [data.length, data.numberAllowed, data.charAllowed]) // Trigger password generation on dependency changes
+
+  useEffect(() => {
+    generatorPassword() // Generate initial password on mount
+  }, [])
 
   const copyPasswordToClipboard = () => {
     window.navigator.clipboard.writeText(data.password)
   }
 
-  const handlePasswordGenerator = () => {
-    generatorPassword()
+  const handlePasswordGenerator = (newData) => {
+    setData(prevData => ({ ...prevData, ...newData }))
   }
-  
-  
 
   return (
     <div className='w-full max-w-md mx-auto shadow-md rounded-lg px-4 py-3 my-8 bg-gray-800 text-orange-500'>
@@ -51,7 +49,6 @@ function App() {
           className='outline-none w-full py-1 px-3'
           placeholder='Password'
           readOnly
-
         />
         <button
           onClick={copyPasswordToClipboard}
@@ -67,37 +64,27 @@ function App() {
             max={100}
             value={data.length}
             className='cursor-pointer'
-            onChange={(e) => {
-              handlePasswordGenerator()
-
-              setData(prevData => ({ ...prevData, length: parseInt(e.target.value) }))
-            }}
+            onChange={(e) => handlePasswordGenerator({ length: parseInt(e.target.value) })}
           />
           <label htmlFor="length">{data.length}</label>
         </div>
         <div className='flex items-center gap-x-1'>
           <input
             type="checkbox"
-            defaultChecked={data.numberAllowed}
-            onChange={() => {
-              setData(prevData => ({ ...prevData, numberAllowed: !prevData.numberAllowed }))
-              handlePasswordGenerator()
-            }}
-            name=""
-            id=""
+            checked={data.numberAllowed}
+            onChange={() => handlePasswordGenerator({ numberAllowed: !data.numberAllowed })}
+            name="number"
+            id="number"
           />
           <label htmlFor="number">Number</label>
         </div>
         <div className='flex items-center gap-x-1'>
           <input
             type="checkbox"
-            defaultChecked={data.charAllowed}
-            onChange={() => {
-              setData(prevData => ({ ...prevData, charAllowed: !prevData.charAllowed }))
-              handlePasswordGenerator()
-            }}
-            name=""
-            id=""
+            checked={data.charAllowed}
+            onChange={() => handlePasswordGenerator({ charAllowed: !data.charAllowed })}
+            name="charInput"
+            id="charInput"
           />
           <label htmlFor="charInput">Character</label>
         </div>
